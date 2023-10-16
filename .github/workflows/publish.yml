@@ -1,0 +1,58 @@
+name: Publish
+
+on:
+  push
+
+jobs:
+  makedoc:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy JavaDoc
+        uses: MathieuSoysal/Javadoc-publisher.yml@v2.4.0
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          javadoc-branch: javadoc
+          java-version: 17
+          target-folder: javadoc
+          project: gradle
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout source
+        uses: actions/checkout@v3
+      - name: Generate versions
+        id: version
+        uses: HardNorth/github-version-generate@v1.3.0
+        with:
+          version-source: file
+          version-file: gradle.properties
+          version-file-extraction-pattern: '(?<=version=).+'
+      - name: Update gradle.properties
+        run: |
+          sed -i 's/^version=.*/version=${{ env.NEXT_RELEASE_VERSION }}/' gradle.properties
+      - uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_user_name: 'version_increaser'
+          commit_user_email: 'phoenixorigin171@gmail.com'
+          commit_message: 'increase version'
+      - name: Setup JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: "temurin"
+          java-version: 17
+      - name: shadowJar
+        uses: gradle/gradle-build-action@v2
+        with:
+          gradle-version: release-candidate
+          arguments: shadowJar
+      - name: Nexus Repo Publish
+        uses: sonatype-nexus-community/nexus-repo-github-action@master
+        with:
+          serverUrl: https://gradle.phoenix.is-a.dev
+          username: admin
+          password: ${{ secrets.password }}
+          format: maven2
+          repository: maven-releases
+          coordinates: groupId=net.phoenix artifactId=interactionAPI version=${{ env.NEXT_RELEASE_VERSION }}
+          assets: extension=jar
+          filename: /build/libs/interactionAPI.jar
