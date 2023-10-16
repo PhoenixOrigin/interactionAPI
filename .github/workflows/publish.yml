@@ -15,7 +15,7 @@ jobs:
           java-version: 17
           target-folder: javadoc
           project: gradle
-  publish:
+  upload:
     runs-on: ubuntu-latest
     steps:
       - name: checkout source
