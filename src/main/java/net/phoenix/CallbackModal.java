@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.interactions.modals.Modal;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class CallbackModal extends ListenerAdapter {
 
@@ -21,7 +22,7 @@ public class CallbackModal extends ListenerAdapter {
 
     public CallbackModal(String name, String id, List<? extends ItemComponent> rows, ModalExecutor executor) {
         this.name = name;
-        this.rows = rows.stream().map(ActionRow::of).toList();
+        this.rows = rows.stream().map(ActionRow::of).collect(Collectors.toList());
         this.id = id;
         this.executor = executor;
     }
