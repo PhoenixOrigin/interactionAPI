@@ -54,5 +54,5 @@ jobs:
           format: maven2
           repository: maven-releases
           coordinates: groupId=net.phoenix artifactId=interactionAPI version=${{ env.NEXT_RELEASE_VERSION }}
-          assets: extension=jar
+          assets: extension=.jar
           filename: /build/libs/interactionAPI.jar
