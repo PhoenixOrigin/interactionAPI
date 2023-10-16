@@ -1,19 +1,15 @@
 package net.phoenix;
 
 import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.hooks.EventListener;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.hooks.SubscribeEvent;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
 import java.util.HashMap;
-import java.util.Map;
 
 public class CommandRegistrar extends ListenerAdapter {
-    private final JDA jda;
     public static HashMap<String, Command> commands = new HashMap<>();
+    private final JDA jda;
 
     public CommandRegistrar(JDA jda) {
         this.jda = jda;
@@ -29,10 +25,8 @@ public class CommandRegistrar extends ListenerAdapter {
     @Override
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
         Command cmd = commands.get(event.getName());
-        if(cmd.subcommands == null || cmd.subcommands.isEmpty()) {
-            cmd.execute(event);
-            return;
-        }
+        if (cmd == null) return;
+        cmd.execute(event);
     }
 
 }
