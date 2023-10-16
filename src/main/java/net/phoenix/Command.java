@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -13,9 +14,9 @@ public class Command {
     private final String name;
     private final String description;
     private final CommandExecutor executor;
-    public List<Subcommand> subcommands;
-    public List<SubcommandGroup> subcommandGroups;
-    private List<OptionData> options;
+    public List<Subcommand> subcommands = new ArrayList<>();
+    public List<SubcommandGroup> subcommandGroups = new ArrayList<>();
+    private List<OptionData> options = new ArrayList<>();
 
     public Command(String name, String description, CommandExecutor executor) {
         this.name = name;
@@ -29,7 +30,7 @@ public class Command {
         this.subcommands = subcommands;
     }
 
-    public void addSubcommanGroups(List<SubcommandGroup> subcommandGroups) {
+    public void addSubcommandGroups(List<SubcommandGroup> subcommandGroups) {
         if (!this.options.isEmpty() || !this.subcommands.isEmpty())
             throw new IllegalArgumentException("Multiple option types may not be used");
         this.subcommandGroups = subcommandGroups;
@@ -42,10 +43,13 @@ public class Command {
     }
 
     public CommandData getCommandData() {
-        if (subcommands != null) {
+        if (subcommands.isEmpty() && subcommandGroups.isEmpty()) {
+            return Commands.slash(name, description).addOptions(options);
+        } else if (!subcommands.isEmpty()) {
             return Commands.slash(name, description).addSubcommands(subcommands.stream().map(Subcommand::getCommandData).collect(Collectors.toList()));
+        } else {
+            return Commands.slash(name, description).addSubcommandGroups(subcommandGroups.stream().map(SubcommandGroup::getCommandData).collect(Collectors.toList()));
         }
-        return Commands.slash(name, description).addOptions(options);
     }
 
     public void execute(SlashCommandInteractionEvent event) {

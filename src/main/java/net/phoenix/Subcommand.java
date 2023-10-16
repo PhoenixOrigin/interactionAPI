@@ -4,14 +4,16 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Subcommand {
 
     public final String name;
     private final String description;
-    private final List<OptionData> options;
     private final Command.CommandExecutor executor;
+    ;
+    private List<OptionData> options = new ArrayList<>();
 
     public Subcommand(String name, String description, List<OptionData> options, Command.CommandExecutor executor) {
         this.name = name;
